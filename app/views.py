@@ -45,6 +45,18 @@ def upload():
 
     return render_template('upload.html', form=form)
 
+def get_uploaded_images():
+    rootdir = os.getcwd()
+    return [file for subdir, dirs, files in os.walk(os.path.join(rootdir, app.config['UPLOAD_FOLDER'])) for file in files if file != '.gitkeep']
+
+@app.route('/files')
+@login_required
+def files():
+    uploads_dir = app.config['UPLOAD_FOLDER']
+    images = get_uploaded_images()
+    print(images)
+
+    return render_template('files.html', images=images)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
