@@ -10,10 +10,10 @@ from werkzeug.security import check_password_hash
 def get_uploaded_images():
     uploadDir = app.config['UPLOAD_FOLDER']
     storage = []
-    for root, dirs, files in os.walk(uploadDir):
-        for file in files:
-            if file.endswith(('.jpg', '.jpeg', '.png')):
-                storage+=(os.path.join(root, file))
+    for root, dirs, images in os.walk(uploadDir):
+        for image in images:
+            if image.endswith(('.jpg', '.jpeg', '.png')):
+                storage+=(os.path.join(root, image))
     return storage
     
 
