@@ -7,6 +7,15 @@ from app.models import UserProfile
 from app.forms import LoginForm, UploadForm
 from werkzeug.security import check_password_hash
 
+def get_uploaded_images():
+    uploadDir = app.config['UPLOAD_FOLDER']
+    storage = []
+    for root, dirs, files in os.walk(uploadDir):
+        for file in files:
+            if file.endswith(('.jpg', '.jpeg', '.png')):
+                storage+=(os.path.join(root, file))
+    return storage
+    
 
 ###
 # Routing for your application.
@@ -35,28 +44,16 @@ def upload():
         return render_template('upload.html', form=form)
     elif request.method == "POST":
             if form.validate_on_submit():
-               imagery = form.image.data
+               imagery = form.file.data
                filename = secure_filename(imagery.filename)
                imgP = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                imagery.save(imgP)
                
                flash('File Saved', 'success')
-               return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
+               return redirect(url_for('files')) # Update this to redirect the user to a route that displays all uploaded image files
 
     return render_template('upload.html', form=form)
 
-def get_uploaded_images():
-    rootdir = os.getcwd()
-    return [file for subdir, dirs, files in os.walk(os.path.join(rootdir, app.config['UPLOAD_FOLDER'])) for file in files if file != '.gitkeep']
-
-@app.route('/files')
-@login_required
-def files():
-    uploads_dir = app.config['UPLOAD_FOLDER']
-    images = get_uploaded_images()
-    print(images)
-
-    return render_template('files.html', images=images)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -93,6 +90,12 @@ def login():
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
+@app.route('/files')
+@login_required
+def files():
+    images = get_uploaded_images()
+    return render_template('files.html', images=images)
+
 @login_manager.user_loader
 def load_user(id):
     return db.session.execute(db.select(UserProfile).filter_by(id=id)).scalar()

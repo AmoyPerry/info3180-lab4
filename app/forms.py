@@ -8,4 +8,4 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired()])
     
 class UploadForm(FlaskForm):
-    image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpeg', 'png', 'jpg' ])])
+    file = FileField('Image', validators=[FileRequired(), FileAllowed(['jpeg', 'png', 'jpg' ], "PNG, JPG and JPEG  only")])
